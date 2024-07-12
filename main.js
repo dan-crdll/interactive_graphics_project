@@ -56,6 +56,36 @@ async function main() {
     const scene = await (await fetch('model/scene.obj')).text()
     let mesh = new ObjMesh()
     mesh.parse(scene)
+
+    /* ATTRIBUTE AND UNIFORM LOCATIONS */
+    const a_position = gl.getAttribLocation(program, 'a_position')
+    const u_proj_matrix = gl.getUniformLocation(program, 'u_proj_matrix')
+    const u_mv_matrix = gl.getUniformLocation(program, 'u_mv_matrix')
+    const u_nmv_matrix = gl.getUniformLocation(program, 'u_nmv_matrix')
+    const u_light_mvp = gl.getUniformLocation(program, 'u_light_mvp')
+    const u_light_dir = gl.getUniformLocation(program, 'u_light_dir')
+    const shadow_map = gl.getUniformLocation(program, 'shadow_map')
+    const u_light_mvp_depth = gl.getUniformLocation(depth_program, 'u_light_mvp')
+
+    /* LIGHT AND MATRICES DEFINITION */
+    const projection = mat4.create()
+    const mv = mat4.create()
+    const nmv = mat4.create()
+    const light_proj = mat4.create()
+    const light_mv = mat4.create()
+    const light_mvp = mat4.create()
+    
+    const light_dir = [1.0, 0.0, 0.0]
+
+    mat4.perspective(projection, 45 * Math.PI / 180.0, canvas.width / canvas.width, 0.1, 100)
+    mat4.translate(mv, mv, [0, 0, -10])
+    mat4.invert(nmv, mv)
+    mat4.transpose(nmv, nmv)
+
+    mat4.ortho(light_proj, -1, 1, -1, 1, 0, 10)
+    mat4.lookAt(light_mv, light_dir, [0, 0, 0], [0, 1, 0])
+
+    mat4.multiply(light_mvp, light_proj, light_mv)
 }
 
 main()

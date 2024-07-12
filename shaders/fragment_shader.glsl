@@ -8,7 +8,7 @@ uniform mediump sampler2DShadow shadow_map;
 in vec3 v_normals;
 in vec4 v_light_seen_position;
 
-out vec3 fragColor;
+out vec4 fragColor;
 
 void main() {
     float enlighted = 1.0;
@@ -19,5 +19,5 @@ void main() {
     float geometry_factor = dot(v_normals, normalized_light_dir);   // compute geometric factor in shading
 
     float light_intensity = max(geometry_factor * enlighted, 0.01);  // max between computed and ambient color
-    fragColor = vec3(1, 1, 1) * max(light_intensity * enlighted, 0.01); // max between light non in shadow and ambient
+    fragColor = vec4(vec3(1, 1, 1) * max(light_intensity * enlighted, 0.01), 1); // max between light non in shadow and ambient
 }
