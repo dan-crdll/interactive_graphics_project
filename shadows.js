@@ -142,6 +142,9 @@ async function main() {
             shade_on = 0
         else
             shade_on = 1
+
+        gl.uniform1f(u_shading, shade_on);
+        gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
     })
 
     shadow_ckb.addEventListener('input', (ev) => {
@@ -149,17 +152,13 @@ async function main() {
             shadow_on = 0
         else
             shadow_on = 1
+
+        gl.uniform1f(u_shadows, shadow_on);
+        gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
     })
 
-    function Render() {
-        gl.uniform1f(u_shading, shade_on);
-        gl.uniform1f(u_shadows, shadow_on);
-
-
-        gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
-        requestAnimationFrame(Render);
-    }
-    Render()
-
+    gl.uniform1f(u_shading, shade_on);
+    gl.uniform1f(u_shadows, shadow_on);
+    gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
 }
 main()
