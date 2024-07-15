@@ -18,11 +18,13 @@ async function main() {
 
     gl.enable(gl.DEPTH_TEST)
     gl.enable(gl.CULL_FACE)
+    /* Do not consider front polygons */
     gl.cullFace(gl.FRONT)
 
     // 1. OUTPUTTING TO FRAME BUFFER Z VALUES FROM LIGHT POV
     gl.useProgram(depth_program);
 
+    /* Load vertex positions and indices */
     const vbuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
     gl.bufferData(gl.ARRAY_BUFFER, scene.positions, gl.STATIC_DRAW);
@@ -33,6 +35,7 @@ async function main() {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, scene.indices, gl.STATIC_DRAW);
 
+    /* Creation of the light pov matrix */
     let light_proj = mat4.create();
     let light_mv = mat4.create();
     let light_mvp = mat4.create();
@@ -61,20 +64,27 @@ async function main() {
 
     // SHADOW MAP TEXTURE CREATION
     const depthmap_size = [1024, 1024];
+
     const shadow_map = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, shadow_map);
     gl.texStorage2D(gl.TEXTURE_2D, 1, gl.DEPTH_COMPONENT32F, depthmap_size[0], depthmap_size[1]);
+
+    /* Parameter which differentiates the shadow map from a normal texture: compare mode and compare func */
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_MODE, gl.COMPARE_REF_TO_TEXTURE);
+    // gl.LEQUAL : 1 if cur_depth <= depth_map else 0
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_COMPARE_FUNC, gl.LEQUAL);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
+    /* Set the frame buffer to output on the texture instead of the canvas */
     const frame_buffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, frame_buffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, shadow_map, 0);
 
     gl.viewport(0, 0, depthmap_size[0], depthmap_size[1]);
     gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0); // Passing depth data to texture through framebuffer
+
+    // back to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
     // 2. MAIN RENDER
@@ -85,8 +95,10 @@ async function main() {
     gl.useProgram(program);
 
     gl.enable(gl.DEPTH_TEST);
+    // ignore polygons on the back
     gl.cullFace(gl.BACK);
 
+    // pass normals
     const a_normal = gl.getAttribLocation(program, 'a_normal');
     const abuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, abuffer);
@@ -94,6 +106,7 @@ async function main() {
     gl.vertexAttribPointer(a_normal, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_normal);
 
+    //get the various locations
     const u_proj = gl.getUniformLocation(program, 'u_proj');
     const u_mv = gl.getUniformLocation(program, 'u_mv');
     const u_nmv = gl.getUniformLocation(program, 'u_nmv');
@@ -101,6 +114,7 @@ async function main() {
     const u_light_mvp_main = gl.getUniformLocation(program, 'u_light_mvp');
     const u_light_dir = gl.getUniformLocation(program, 'u_light_dir');
 
+    // create projection and model view matrices for the scene and the normal matrix for shading
     let proj = mat4.create();
     let mv = mat4.create();
     let nmv = mat4.create();
@@ -116,8 +130,7 @@ async function main() {
     mat4.invert(nmv, mv);
     mat4.transpose(nmv, nmv);
 
-
-
+    // pass all matrices to the GPU
     gl.uniformMatrix4fv(u_proj, false, proj);
     gl.uniformMatrix4fv(u_mv, false, mv);
     gl.uniformMatrix4fv(u_nmv, false, nmv);
@@ -157,6 +170,7 @@ async function main() {
         gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
     })
 
+    // finally render the scene
     gl.uniform1f(u_shading, shade_on);
     gl.uniform1f(u_shadows, shadow_on);
     gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);

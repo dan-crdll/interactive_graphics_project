@@ -3,5 +3,5 @@ precision mediump float;
 
 out float fragDepth;
 void main() {
-    fragDepth = gl_FragCoord.z;
+    fragDepth = gl_FragCoord.z; // output the depth to the frame buffer
 }

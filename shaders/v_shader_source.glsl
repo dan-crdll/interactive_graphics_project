@@ -21,6 +21,8 @@ out float v_shading;
 void main() {
     gl_Position = u_proj * u_mv * vec4(a_position, 1);
 
+    // we want to pass to fragment shader the position as seen from the light for comparisons,
+    // the normals for shading and the light direction
     v_light_pov = u_light_mvp * vec4(a_position, 1);
     v_normal = u_nmv * vec4(a_normal, 0);
     v_light_dir = normalize(u_light_dir);
