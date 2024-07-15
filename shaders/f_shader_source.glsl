@@ -24,9 +24,9 @@ void main() {
   light_pov_position = vec3(light_pov_position.xy, light_pov_position.z - bias);
 
   for (int i = 0; i < 4; i++) {
-    vec3 biased = vec3(light_pov_position.xy + adjacentPixels[i]/1100.0, light_pov_position.z);
+    vec3 biased = vec3(light_pov_position.xy + adjacentPixels[i]/1500.0, light_pov_position.z);
     float hit = texture(u_shadowmap, biased);
-    visibility *= max(hit, 0.83);
+    visibility *= max(hit, 0.9);
   }
 
   vec3 normalized_normal = normalize(v_normal.xyz);
