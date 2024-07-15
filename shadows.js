@@ -128,8 +128,6 @@ async function main() {
     gl.bindTexture(gl.TEXTURE_2D, shadow_map);
     gl.uniform1i(u_shadowmap, 0);
 
-//    gl.useProgram(depth_program)
-
     const u_shadows = gl.getUniformLocation(program, 'u_shadows');
     const u_shading = gl.getUniformLocation(program, 'u_shading');
 
@@ -157,9 +155,11 @@ async function main() {
         gl.uniform1f(u_shading, shade_on);
         gl.uniform1f(u_shadows, shadow_on);
 
+
         gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
         requestAnimationFrame(Render);
     }
     Render()
+
 }
 main()
