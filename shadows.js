@@ -152,23 +152,23 @@ async function main() {
 
     shade_ckb.addEventListener('input', (ev) => {
         if(shade_on) 
-            shade_on = 0
+            shade_on = 0;
         else
-            shade_on = 1
+            shade_on = 1;
 
         gl.uniform1f(u_shading, shade_on);
         gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
-    })
+    });
 
     shadow_ckb.addEventListener('input', (ev) => {
         if(shadow_on) 
-            shadow_on = 0
+            shadow_on = 0;
         else
-            shadow_on = 1
+            shadow_on = 1;
 
         gl.uniform1f(u_shadows, shadow_on);
         gl.drawElements(gl.TRIANGLES, scene.indices.length, gl.UNSIGNED_SHORT, 0);
-    })
+    });
 
     // finally render the scene
     gl.uniform1f(u_shading, shade_on);
